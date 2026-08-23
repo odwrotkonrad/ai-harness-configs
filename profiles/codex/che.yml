@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://gitlab.com/konradodwrot/go-modules/-/raw/main/che/assets/data/che.schema.json
+##[>] 🤖🤖
+options:
+  profileWorkingDirectory: root
+
+ai/codex:
+  include:
+    makeLinks:
+      - etc/**
+    renderTemplates:
+      - source: _home/**
+        dest: $HOME/**
+    makeDirs:
+      - directories:
+          - dest:
+              - $HOME/.config/codex
+          - dest:
+              - $HOME/.local/state/codex/log
+    installPackages:
+      - codex
+##[<] 🤖🤖

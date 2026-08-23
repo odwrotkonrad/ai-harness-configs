@@ -1,0 +1,59 @@
+##[>] 🤖
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+stages:
+  - validate
+  - release
+
+#[why] all CI runs on the self-hosted GKE runners: no SaaS compute minutes remain
+#[why] a superseded pipeline holds pods for a commit nobody will merge: cancel it and let
+#   the autoscaler release the node. jobs with an external side effect opt out individually
+default:
+  interruptible: true
+  #[why] spot nodes are preempted mid-job and the manager itself runs on spot: infrastructure
+  #   failures are expected, not exceptional. 2 is gitlab's hard maximum, so 3 attempts in total.
+  #   retries cover runner and API faults only, never a failing script
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - api_failure
+      - stuck_or_timeout_failure
+      - scheduler_failure
+      - unknown_failure
+  tags:
+    - gke-linux-amd64-small
+
+variables:
+  ARTIFACT_REGISTRY: $GRP_KO_VAR_ARTIFACT_REGISTRY
+  CI_IMAGES_REF: $GRP_KO_VAR_CI_IMAGES_REF
+  PROSE_ASSETS_REF: $GRP_KO_VAR_PROSE_ASSETS_REF
+  PROSE_SPEC_REF: $GRP_KO_VAR_PROSE_SPEC_REF
+  AI_CONFIGS_REF: $GRP_KO_VAR_AI_CONFIGS_REF
+  MISC_REF: $GRP_KO_VAR_MISC_REF
+  CI_IMAGE: $ARTIFACT_REGISTRY/ci-linux:$CI_IMAGES_REF
+
+validate-pre-commit-all:
+  stage: validate
+  image: $CI_IMAGE
+  script:
+    - make repo-ci-precommit-all
+    - git diff --exit-code HEAD
+
+#[why] a merge to the default branch is the release event: mint the next semver tag so consumers can
+#   pin a version instead of tracking a moving branch. tag only, no release object: nothing here ships
+#   an artifact
+tag-mint:
+  stage: release
+  image: $CI_IMAGE
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  variables:
+    GIT_DEPTH: "0"
+    TAG_TOKEN: $REPO_VAR_TAG_TOKEN
+  script:
+    - make tag-mint
+##[<] 🤖

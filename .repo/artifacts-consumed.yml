@@ -1,0 +1,13 @@
+##[>] 🤖
+consumes:
+  - artifact: gitlab.com/konradodwrot/go-modules/che
+    version: che/v0.0.94
+  - artifact: https://gitlab.com/konradodwrot/cross-repo/misc
+    version: v0.0.23
+  - artifact: https://gitlab.com/konradodwrot/cross-repo/prose/assets
+    version: v0.0.60
+  - artifact: https://gitlab.com/konradodwrot/cross-repo/prose/spec
+    version: v0.0.31
+  - artifact: us-central1-docker.pkg.dev/staging-499418/ci/ci-linux
+    version: v0.0.124
+##[<] 🤖
