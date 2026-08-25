@@ -1,7 +1,7 @@
 ##[>] 🤖
-produces:
+downstream:
   - uri: gitlab.com/konradodwrot/ai-harness/configs
     type: gitRepository
     versionEnvVar: AI_CONFIGS_REF
-    version: v0.0.1
+    version: {{ env.Getenv "AI_CONFIGS_REF" }}
 ##[<] 🤖
