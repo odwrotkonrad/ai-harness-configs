@@ -1,6 +1,6 @@
 ##[>] 🤖
 dependsOn:
-  gitlab.com/konradodwrot/ai-harness/configs: []
+  gitlab.com/konradodwrot/ai-harness/ai-tools-configs: []
   ciEnv:
     - uri: gitlab.com/konradodwrot/cross-repo/misc
       type: gitRepository
