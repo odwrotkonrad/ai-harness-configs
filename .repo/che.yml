@@ -4,6 +4,8 @@ options:
   profileWorkingDirectory: ..
 
 repo/genfiles:
+  options:
+    autoDiscover: false
   include:
     renderTemplates:
       - source: "git::gitlab.com/konradodwrot/cross-repo/prose/assets@${{ var.PROSE_ASSETS_REF }}"
