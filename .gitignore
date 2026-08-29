@@ -1,5 +1,6 @@
 !profiles/**/.*
 !.repo/
+!.che/
 ##[>] 🤖
 /AGENTS.md
 /CLAUDE.md
