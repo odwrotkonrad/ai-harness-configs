@@ -8,7 +8,7 @@
 /assets/data/repo-structure.md
 /assets/docs-agents/purpose.md
 
-#[why] AI prose payloads: authored in prose, rendered here by repo/genfiles, loaded onto the host from this tree
+#[why] AI prose payloads: authored in prose, rendered onto the host by the profiles, never tracked here
 /profiles/base/root/_home/.config/ai-agents/docs/*.md
 /profiles/claude/root/_home/.config/claude/output-styles/*.md
 /profiles/claude/root/_home/.config/claude/rules/**/*.md
