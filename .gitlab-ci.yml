@@ -41,8 +41,7 @@ validate-pre-commit-all:
   rules:
     - changes:
         - .gitlab-ci.yml
-        - .env.tpl
-        - che.yml
+        - .che/**/*
         - Makefile
         - lefthook.yml
         - .repo/*.tpl
@@ -67,7 +66,7 @@ tag-mint:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         - profiles/**/*
-        - che.yml
+        - .che/**/*
         - Makefile
         - .gitlab-ci.yml
   variables:
