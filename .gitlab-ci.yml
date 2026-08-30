@@ -10,7 +10,11 @@ include:
     ref: $GRP_KO_VAR_CENTRALIZED_ASSETS_GENERIC_REF
     file: consumer-repo-config/release/templates/TagMint.gitlab-ci.yml
     inputs:
-      changes: [profiles/**/*, .che/**/*, Makefile, .gitlab-ci.yml]
+      changes:
+        - profiles/**/*
+        - .che/**/*
+        - Makefile
+        - .gitlab-ci.yml
 
 workflow:
   rules:
