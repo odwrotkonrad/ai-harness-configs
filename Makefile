@@ -4,11 +4,11 @@ SHELL := zsh
 .SHELLFLAGS := -c
 
 CHE := che $(if $(CHE_PROFILE),--profiles=$(CHE_PROFILE) --skip-run-if)
-WRAPPERS := repo-prepare-dev-env
-COMMANDS := semver-next tag-mint host-load-configs host-load-configs-install repo-ci-prepare-hooks repo-ci-precommit-all
+COMMANDS := che-install generic-setup host-load-configs host-load-configs-install
 
-#[why] render-templates, repo-ci-render-templates and repo-render-env are declared .PHONY by the shared .mk, never here: a .PHONY name make cannot build reports "nothing to be done" and exits 0, turning a failed bootstrap into a silent success
-.PHONY: $(WRAPPERS) $(COMMANDS)
+.PHONY: $(COMMANDS)
+
+-include shared/generic/make/generic.mk
 
 ##[>] Environment Variables [genai-include]
 #[what] force one che profile for host ops, passed as `$ che --profiles --skip-run-if`
@@ -16,23 +16,17 @@ COMMANDS := semver-next tag-mint host-load-configs host-load-configs-install rep
 export CHE_PROFILE
 ##[<] Environment Variables
 
-##[>] Dev Environment [genai-include]
-#[why] render precedes hooks: the docsgen pre-commit hook runs render-templates and fails on drift,
-#   so a fresh clone whose generated files were never rendered would fail its first commit
-#[what] make a fresh clone a working checkout: generated docs, git hooks
-repo-prepare-dev-env: repo-render-env render-templates repo-ci-prepare-hooks
-##[<] Dev Environment
+##[>] Setup [genai-include]
+#[what] install the latest released che into ~/.local/bin, only when the one on PATH is older
+che-install:
+	@curl -fsSL https://konradodwrot.gitlab.io/go-modules/che-install.sh | sh -s -- --skip-if-present-is-newer
 
-##[>] Docs [genai-include]
-#[what] shared render targets, authored in cross-repo/misc and rendered here by the bootstrap rule below
--include shared/ci/make/render.mk
+#[what] render the generic consumer payload (generic.mk, lefthook.yml, shared/generic/) at the pinned CENTRALIZED_ASSETS_GENERIC_REF
+generic-setup:
+	@$${CHE_BIN:-che} render-templates --profiles=genericSetup
 
-#[why] gitignored shared/ tree: a fresh clone has no render.mk, so make renders it, then re-execs itself with the shared targets defined
-#[why] CI carries every ref as a job variable and has no glab auth: seed .env only when the environment names no MISC_REF
-shared/ci/make/render.mk:
-	@[[ -n $${MISC_REF:-} ]] || CHE_ENV_UNSET=empty $${CHE_BIN:-che} render-templates --profiles=envSeed
-	@$${CHE_BIN:-che} render-templates --profiles=bootstrapCrossRepoCI
-##[<] Docs
+shared/generic/make/generic.mk: generic-setup
+##[<] Setup
 
 ##[>] Onto Host [genai-include]
 #[what] load AI configs onto host, profile by profile: each profile's full op sequence minus scripts and package installs
@@ -43,24 +37,4 @@ host-load-configs:
 host-load-configs-install:
 	@$(CHE) run
 ##[<] Onto Host
-
-##[>] Release [genai-include]
-#[what] print the next semver tag inferred from the last tag..HEAD diff (override: `semver: major|minor|patch` commit token)
-semver-next: render-templates
-	@shared/ci/semver-bump.zsh
-
-#[what] mint and push the next semver tag (CI: authed via TAG_TOKEN)
-tag-mint: render-templates
-	@shared/ci/tag-mint.zsh
-##[<] Release
-
-##[>] CI [genai-include]
-#[what] install lefthook git hooks
-repo-ci-prepare-hooks:
-	@lefthook install --force
-
-#[what] run pre-commit hooks over all files (not just staged)
-repo-ci-precommit-all: repo-ci-prepare-hooks
-	@lefthook run pre-commit --all-files --force
-##[<] CI
 ##[<] 🤖🤖

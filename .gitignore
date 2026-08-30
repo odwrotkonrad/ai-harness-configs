@@ -15,7 +15,7 @@
 #[why] skills render as directories, so the SKILL.md and any sibling payload are ignored while the
 #   hand-written scripts/ helpers beside them stay tracked
 /profiles/claude/root/_home/.config/claude/skills/**/SKILL.md
-#[why] shared render + tagging payload: authored in cross-repo/misc, rendered here, never tracked
 /shared/
 /.env
+/lefthook.yml
 ##[<] 🤖
