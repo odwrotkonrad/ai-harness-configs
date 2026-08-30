@@ -3,8 +3,8 @@
 SHELL := zsh
 .SHELLFLAGS := -c
 
-CHE := che $(if $(CHE_PROFILE),--profiles=$(CHE_PROFILE) --skip-run-if)
-COMMANDS := che-install generic-setup host-load-configs host-load-configs-install
+CHE := che $(if $(CHE_PROFILE),--profiles=$(CHE_PROFILE) --skip-run-if,--target-profile-types=host)
+COMMANDS := che-install generic-setup repo-prepare repo-files-untracked-load repo-files-tracked-load host-load-configs host-load-configs-install
 
 .PHONY: $(COMMANDS)
 
@@ -23,10 +23,24 @@ che-install:
 
 #[what] render the generic consumer payload (generic.mk, lefthook.yml, shared/generic/) at the pinned CENTRALIZED_ASSETS_GENERIC_REF
 generic-setup:
-	@$${CHE_BIN:-che} render-templates --profiles=genericSetup
+	@$${BIN_CHE:-che} render-templates --profiles=genericSetup
 
 shared/generic/make/generic.mk: generic-setup
 ##[<] Setup
+
+##[>] Onto Repo [genai-include]
+#[what] prepare the checkout: every repo-git-untracked profile, then every repo-git-tracked one
+repo-prepare: repo-files-untracked-load repo-files-tracked-load
+
+#[why] untracked first: the tracked renders (README) inline data files the untracked profiles produce
+#[what] run every repo-git-untracked profile: gitignored renders, generic payload
+repo-files-untracked-load:
+	@che run --target-profile-types=repo-git-untracked
+
+#[what] run every repo-git-tracked profile: git-tracked renders (README, LICENSE)
+repo-files-tracked-load:
+	@che run --target-profile-types=repo-git-tracked
+##[<] Onto Repo
 
 ##[>] Onto Host [genai-include]
 #[what] load AI configs onto host, profile by profile: each profile's full op sequence minus scripts and package installs
