@@ -2,14 +2,16 @@
 dependsOn:
   gitlab.com/konradodwrot/ai-harness/ai-tools-configs: []
   ciEnv:
-    - uri: gitlab.com/konradodwrot/cross-repo/misc
+    - uri: gitlab.com/konradodwrot/centralized/assets/generic
       type: gitRepository
     - uri: gitlab.com/konradodwrot/go-modules/che
       type: goModule
     - uri: us-central1-docker.pkg.dev/staging-499418/ci/ci-linux
       type: ociImage
   repoContents:
-    - uri: gitlab.com/konradodwrot/cross-repo/prose/assets
+    - uri: gitlab.com/konradodwrot/centralized/assets/prose/ai
+      type: gitRepository
+    - uri: gitlab.com/konradodwrot/centralized/assets/prose/ai
       type: gitRepository
     - uri: gitlab.com/konradodwrot/cross-repo/prose/spec
       type: gitRepository

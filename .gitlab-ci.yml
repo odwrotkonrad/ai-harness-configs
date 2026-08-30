@@ -1,4 +1,17 @@
-##[>] 🤖
+##[>] 🤖🤖
+include:
+  - project: konradodwrot/centralized/assets/generic
+    ref: $GRP_KO_VAR_CENTRALIZED_ASSETS_GENERIC_REF
+    file:
+      - consumer-repo-config/files-generation/templates/FilesTrackedVerify.gitlab-ci.yml
+      - consumer-repo-config/precommit-lefthook/templates/PrecommitChanged.gitlab-ci.yml
+      - consumer-repo-config/precommit-lefthook/templates/PrecommitAll.gitlab-ci.yml
+  - project: konradodwrot/centralized/assets/generic
+    ref: $GRP_KO_VAR_CENTRALIZED_ASSETS_GENERIC_REF
+    file: consumer-repo-config/release/templates/TagMint.gitlab-ci.yml
+    inputs:
+      changes: [profiles/**/*, .che/**/*, Makefile, .gitlab-ci.yml]
+
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -30,48 +43,10 @@ default:
 variables:
   ARTIFACT_REGISTRY: $GRP_KO_VAR_ARTIFACT_REGISTRY
   OCI_IMAGES_CI_LINUX_REF: $GRP_KO_VAR_OCI_IMAGES_CI_LINUX_REF
-  PROSE_ASSETS_REF: $GRP_KO_VAR_PROSE_ASSETS_REF
   CHE_SCHEMA_REF: $GRP_KO_VAR_CHE_SCHEMA_REF
   PROSE_SPEC_REF: $GRP_KO_VAR_PROSE_SPEC_REF
+  CENTRALIZED_ASSETS_GENERIC_REF: $GRP_KO_VAR_CENTRALIZED_ASSETS_GENERIC_REF
+  CENTRALIZED_ASSETS_PROSE_AI_REF: $GRP_KO_VAR_CENTRALIZED_ASSETS_PROSE_AI_REF
   AI_TOOLS_CONFIGS_REF: $GRP_KO_VAR_AI_TOOLS_CONFIGS_REF
-  MISC_REF: $GRP_KO_VAR_MISC_REF
   CI_IMAGE: $ARTIFACT_REGISTRY/ci-linux:$OCI_IMAGES_CI_LINUX_REF
-
-validate-pre-commit-all:
-  rules:
-    - changes:
-        - .gitlab-ci.yml
-        - .che/**/*
-        - Makefile
-        - lefthook.yml
-        - .repo/*.tpl
-        - .repo/deps-graph.yml
-        - .repo/upstream.yml
-        - .repo/upstream.env
-        - profiles/**/*
-        - README.md
-  stage: validate
-  image: $CI_IMAGE
-  script:
-    - make repo-ci-precommit-all
-    - git diff --exit-code HEAD
-
-#[why] a merge to the default branch is the release event: mint the next semver tag so consumers can
-#   pin a version instead of tracking a moving branch. tag only, no release object: nothing here ships
-#   an artifact
-tag-mint:
-  stage: release
-  image: $CI_IMAGE
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        - profiles/**/*
-        - .che/**/*
-        - Makefile
-        - .gitlab-ci.yml
-  variables:
-    GIT_DEPTH: "0"
-    TAG_TOKEN: $REPO_PROTECTED_VAR_BOT_TAG_TOKEN
-  script:
-    - make tag-mint
-##[<] 🤖
+##[<] 🤖🤖
