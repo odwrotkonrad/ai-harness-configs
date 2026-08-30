@@ -3,12 +3,15 @@
 options:
   profileWorkingDirectory: root
 
-ai/ollama:
-  include:
-    makeLinks:
-      - source: _home/**
-        dest: $HOME/**
-      - usr/**
-    installPackages:
-      - ollama
+profilesDefinitions:
+  'ai/ollama':
+    type: host
+    include:
+      makeLinks:
+        - source: _home/**
+          dest: $HOME/**
+        - usr/**
+      installPackages:
+        - ollama
+
 ##[<] 🤖🤖
